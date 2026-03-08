@@ -51,6 +51,34 @@
             margin-bottom: 20px;
         }
 
+        /* 搜索栏样式 */
+        .search-bar {
+            margin: 20px 0;
+        }
+
+        .search-bar input {
+            width: 80%;
+            max-width: 600px;
+            padding: 12px;
+            background: rgba(20, 20, 50, 0.8);
+            border: 1px solid rgba(64, 156, 255, 0.3);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .search-results {
+            background: rgba(30, 30, 70, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
         /* 导航样式 */
         nav {
             background: rgba(20, 20, 60, 0.8);
@@ -74,6 +102,12 @@
             padding: 10px 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-links a.active {
+            background: rgba(64, 156, 255, 0.4);
+            color: #ffffff;
         }
 
         .nav-links a:hover {
@@ -91,11 +125,16 @@
         }
 
         /* 论坛板块 */
-        .forum-section {
+        .forum-section, .home-section, .members-section, .resources-section, .about-section {
             background: rgba(30, 30, 70, 0.8);
             border-radius: 15px;
             padding: 25px;
             border: 1px solid rgba(64, 156, 255, 0.2);
+            display: none;
+        }
+
+        .active-section {
+            display: block;
         }
 
         .section-title {
@@ -185,6 +224,11 @@
             border-radius: 15px;
             padding: 25px;
             margin-top: 30px;
+            display: none;
+        }
+
+        .new-topic-form.active-section {
+            display: block;
         }
 
         .form-group {
@@ -255,6 +299,10 @@
             .logo {
                 font-size: 2.5rem;
             }
+
+            .search-bar input {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -263,21 +311,30 @@
         <header>
             <h1 class="logo">🚀 星际航行论坛</h1>
             <p class="tagline">探索宇宙航行的未来 · 讨论实现星际旅行的路线 · 连接全球太空探索者</p>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="搜索论坛话题...">
+            </div>
+            <div class="search-results" id="searchResults"></div>
         </header>
 
         <nav>
             <ul class="nav-links">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#forums">论坛</a></li>
-                <li><a href="#new">新话题</a></li>
-                <li><a href="#members">成员</a></li>
-                <li><a href="#resources">资源</a></li>
-                <li><a href="#about">关于</a></li>
+                <li><a href="#home" class="nav-link active" data-section="home-section">首页</a></li>
+                <li><a href="#forums" class="nav-link" data-section="forums-section">论坛</a></li>
+                <li><a href="#new" class="nav-link" data-section="new-topic-form">新话题</a></li>
+                <li><a href="#members" class="nav-link" data-section="members-section">成员</a></li>
+                <li><a href="#resources" class="nav-link" data-section="resources-section">资源</a></li>
+                <li><a href="#about" class="nav-link" data-section="about-section">关于</a></li>
             </ul>
         </nav>
 
         <div class="main-content">
-            <main class="forum-section">
+            <section id="home-section" class="home-section active-section">
+                <h2 class="section-title">🌌 欢迎来到星际航行论坛</h2>
+                <p>这里是全球太空探索者的聚集地，讨论星际航行的技术、路线、伦理等话题。加入我们，共同探索宇宙的未来！</p>
+            </section>
+
+            <section id="forums-section" class="forum-section">
                 <h2 class="section-title">📡 热门讨论板块</h2>
                 
                 <div class="forum-category">
@@ -345,7 +402,22 @@
                         </li>
                     </ul>
                 </div>
-            </main>
+            </section>
+
+            <section id="members-section" class="members-section">
+                <h2 class="section-title">👥 成员社区</h2>
+                <p>探索我们的活跃成员，查看他们的贡献和讨论。加入社区，成为星际探索的一员！</p>
+            </section>
+
+            <section id="resources-section" class="resources-section">
+                <h2 class="section-title">📚 资源中心</h2>
+                <p>查阅最新的星际航行研究论文、技术文档和学习资源。</p>
+            </section>
+
+            <section id="about-section" class="about-section">
+                <h2 class="section-title">ℹ️ 关于我们</h2>
+                <p>星际航行论坛致力于推动人类对宇宙的探索，通过开放的讨论和知识分享，连接全球的太空爱好者和专业人士。</p>
+            </section>
 
             <aside class="sidebar">
                 <div class="stats">
@@ -383,7 +455,7 @@
             </aside>
         </div>
 
-        <section class="new-topic-form">
+        <section class="new-topic-form" id="new-topic-form">
             <h2 class="section-title">💫 发起新讨论</h2>
             <form id="newTopicForm">
                 <div class="form-group">
@@ -422,6 +494,58 @@
     </div>
 
     <script>
+        // 导航切换
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.home-section, .forum-section, .new-topic-form, .members-section, .resources-section, .about-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // 移除所有链接和section的active状态
+                navLinks.forEach(l => l.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active-section'));
+                
+                // 添加当前链接和对应section的active状态
+                link.classList.add('active');
+                const sectionId = link.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active-section');
+            });
+        });
+
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const threadItems = document.querySelectorAll('.thread-item');
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            searchResults.innerHTML = '';
+            searchResults.classList.remove('active');
+
+            if (query.trim() === '') {
+                return;
+            }
+
+            const results = [];
+            threadItems.forEach(item => {
+                const title = item.querySelector('.thread-title').textContent.toLowerCase();
+                if (title.includes(query)) {
+                    results.push(item.cloneNode(true));
+                }
+            });
+
+            if (results.length > 0) {
+                searchResults.classList.add('active');
+                results.forEach(result => {
+                    searchResults.appendChild(result);
+                });
+            } else {
+                searchResults.classList.add('active');
+                searchResults.innerHTML = '<p style="color: #a0a0ff;">未找到匹配的话题</p>';
+            }
+        });
+
         // 表单提交处理
         document.getElementById('newTopicForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -435,10 +559,7 @@
                 return;
             }
             
-            // 这里可以添加AJAX请求到后端
             alert(`话题"${title}"已提交！\n板块：${category}\n\n（这是一个演示，实际需要后端支持）`);
-            
-            // 清空表单
             this.reset();
         });
 
